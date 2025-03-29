@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { backend } from 'declarations/backend';
-import botImg from '/bot.svg';
 import aiStyloImg from '/ai-stylo.png';
 import userImg from '/user.svg';
 import '/index.css';
@@ -78,7 +77,7 @@ const App = () => {
   const [chat, setChat] = useState([
     {
       role: { system: null },
-      content: "I'm a sovereign AI agent living on the Internet Computer. Ask me anything."
+      content: "Hi, I'm AI Stylo, your fashion advisor. How can I help you today?"
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -127,7 +126,7 @@ const App = () => {
     };
     const thinkingMessage = {
       role: { system: null },
-      content: 'Thinking ...'
+      content: 'Composing the best personalized outfit for you...'
     };
     setChat((prevChat) => [...prevChat, userMessage, thinkingMessage]);
     setInputValue('');
@@ -148,8 +147,8 @@ const App = () => {
         <div className="flex-1 overflow-y-auto rounded-t-lg bg-gray-100 p-4" ref={chatBoxRef}>
           {chat.map((message, index) => {
             const isUser = 'user' in message.role;
-            const img = isUser ? userImg : botImg;
-            const name = isUser ? 'User' : 'System';
+            const img = isUser ? userImg : aiStyloImg;
+            const name = isUser ? 'User' : 'Stylo AI';
             const text = message.content;
 
             return (
