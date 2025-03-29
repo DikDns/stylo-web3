@@ -1,3 +1,4 @@
+import React from "react";
 export const Button = ({ children, icon, onClick, ...props }) => {
   return (
     <button

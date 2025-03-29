@@ -1,3 +1,4 @@
+import React from "react";
 import Card from "./card";
 export const ImageCard = ({ imageUrl, ...props }) => {
   return (
