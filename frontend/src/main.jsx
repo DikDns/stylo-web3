@@ -1,98 +1,47 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom/client";
+import autoAnimate from "https://cdn.jsdelivr.net/npm/@formkit/auto-animate";
 import { backend } from "declarations/backend";
-import { Button } from "./button.jsx";
+import { TopBar } from "./top-bar.jsx";
+import { ChatMessage } from "./chat-message.jsx";
+import { ChatInput } from "./chat-input.jsx";
+import { ClothingGrid } from "./clothing-grid.jsx";
 import aiStyloImg from "/ai-stylo.png";
 import userImg from "/user.svg";
-import sparklingIcon from "/sparkling-icon.svg";
 import "/index.css";
-import { ImageCard } from "./image-card.jsx";
 
-const CLOTHING_DATA = [
-  {
-    id: 1,
-    clothing_type: "T-Shirt",
-    color: "Navy Blue",
-    brand: "Nike",
-    image_url: "https://example.com/images/nike_navy_tshirt.jpg",
-    category: "upper",
-  },
-  {
-    id: 2,
-    clothing_type: "Jeans",
-    color: "Dark Wash",
-    brand: "Levi's",
-    image_url: "https://example.com/images/levis_darkwash_jeans.jpg",
-    category: "lower",
-  },
-  {
-    id: 3,
-    clothing_type: "Sneakers",
-    color: "White",
-    brand: "Adidas",
-    image_url: "https://example.com/images/adidas_white_sneakers.jpg",
-    category: "footwear",
-  },
-  {
-    id: 4,
-    clothing_type: "Blazer",
-    color: "Black",
-    brand: "Zara",
-    image_url: "https://example.com/images/zara_black_blazer.jpg",
-    category: "outerwear",
-  },
-  {
-    id: 5,
-    clothing_type: "Scarf",
-    color: "Multicolor",
-    brand: "Gucci",
-    image_url: "https://example.com/images/gucci_multicolor_scarf.jpg",
-    category: "accessories",
-  },
-];
+const CLOTHINGS_DATA_URL =
+  "https://cdn.jsdelivr.net/gh/DikDns/stylo-assets@main/clothings.json";
+const PROMPT_TEMPLATE_URL =
+  "https://cdn.jsdelivr.net/gh/DikDns/stylo-assets@main/prompt-template.txt";
 
-const PROMPT_TEMPLATE = `You are a helpful and creative fashion advisor. Your goal is to recommend the best outfit from a given list of clothing items based on the user's stated situation or desired look.
+const scrollToBottom = (chatBoxRef) => {
+  const scrollHeight = chatBoxRef.current.scrollHeight;
+  chatBoxRef.current.scrollTo({
+    top: scrollHeight,
+    behavior: "smooth",
+  });
+};
 
-Here is the list of clothing items available:
-\`\`\`json
-${JSON.stringify(CLOTHING_DATA)}
-\`\`\`
-
-The user's request is about:
-\`\`\`
-{{user_request}}
-\`\`\`
-
-Based on the user's request and the available clothing, recommend an outfit. Consider the occasion and suggest a cohesive look. Briefly explain your reasoning for the outfit choices.
-
-Your output should ONLY be in JSON format like this, don't add other responses.
-
-Example Output:
-\`\`\`json
-{
-  "content": "For a party, I recommend pairing the Black Blazer with the Dark Wash Jeans for a stylish yet comfortable look. You can layer the Navy Blue T-Shirt underneath for a touch of casualness. Complete the outfit with the White Sneakers for a modern and fun vibe.",
-  "clothing_ids": [4, 2, 1, 3]
-}
-\`\`\`
-`;
+const formatDate = (date) => {
+  const h = "0" + date.getHours();
+  const m = "0" + date.getMinutes();
+  return `${h.slice(-2)}:${m.slice(-2)}`;
+};
 
 const App = () => {
+  const [promptTemplate, setPromptTemplate] = useState("");
+  const [clothings, setClothings] = useState([]);
   const [chat, setChat] = useState([
     {
       role: { system: null },
-      content:
-        "Hi, I'm AI Stylo, your fashion advisor. How can I help you today?",
+      content: "Hi, I'm Stylo, your fashion advisor. How can I help you today?",
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatBoxRef = useRef(null);
-
-  const formatDate = (date) => {
-    const h = "0" + date.getHours();
-    const m = "0" + date.getMinutes();
-    return `${h.slice(-2)}:${m.slice(-2)}`;
-  };
+  const chatRef = useRef(null);
 
   const askAgent = async (messages) => {
     try {
@@ -140,7 +89,7 @@ const App = () => {
     };
     const thinkingMessage = {
       role: { system: null },
-      content: "Composing the best personalized outfit for you...",
+      content: "",
     };
     setChat((prevChat) => [...prevChat, userMessage, thinkingMessage]);
     setInputValue("");
@@ -148,112 +97,95 @@ const App = () => {
 
     const messageWithPrompt = {
       role: { user: null },
-      content: PROMPT_TEMPLATE.replace("{{user_request}}", inputValue),
+      content: promptTemplate
+        .replace("{{user_request}}", inputValue)
+        .replace("{{clothing_data}}", JSON.stringify(clothings)),
     };
     const messagesToSend = chat.slice(1).concat(messageWithPrompt);
     askAgent(messagesToSend);
   };
 
   useEffect(() => {
+    chatRef.current && autoAnimate(chatRef.current);
+  }, [chatRef]);
+
+  useEffect(() => {
     if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+      const timeout = setTimeout(() => {
+        scrollToBottom(chatBoxRef);
+      }, 250);
+
+      return () => clearTimeout(timeout);
     }
   }, [chat]);
 
+  useEffect(() => {
+    const fetchClothings = async () => {
+      try {
+        const response = await fetch(CLOTHINGS_DATA_URL);
+        const data = await response.json();
+        setClothings(data);
+        console.log("Clothing data:", data);
+      } catch (error) {
+        console.error("Error fetching clothing data:", error);
+      }
+    };
+    const fetchPromptTemplate = async () => {
+      try {
+        const response = await fetch(PROMPT_TEMPLATE_URL);
+        const data = await response.text();
+        setPromptTemplate(data);
+      } catch (error) {
+        console.error("Error fetching prompt template:", error);
+      }
+    };
+
+    fetchPromptTemplate();
+    fetchClothings();
+  }, []);
+
   return (
-    <div className="p-8 md:p-16 overflow-y-auto h-screen" ref={chatBoxRef}>
-      <div className="flex-1 rounded-t-lg p-4 pb-6 md:pb-12">
-        {chat.map((message, index) => {
-          const isUser = "user" in message.role;
-          const img = isUser ? userImg : aiStyloImg;
-          const name = isUser ? "User" : "Stylo AI";
-          const text = message.content;
+    <div className="h-screen flex flex-col">
+      <TopBar />
+      <div
+        className="flex-1 overflow-y-auto p-8 md:p-16 pb-64"
+        ref={chatBoxRef}
+      >
+        <div className="flex-1 rounded-t-lg p-4 pb-10 md:pb-40" ref={chatRef}>
+          {chat.map((message, index) => {
+            const isUser = "user" in message.role;
+            const img = isUser ? userImg : aiStyloImg;
+            const name = isUser ? "User" : "Stylo";
+            const text = message.content;
 
-          return (
-            <div
-              key={index}
-              className={`flex ${
-                isUser ? "justify-end" : "justify-start"
-              } w-full mb-2`}
-            >
-              {!isUser && (
-                <div
-                  className="mr-2 h-10 w-10 rounded-full"
-                  style={{
-                    backgroundImage: `url(${img})`,
-                    backgroundSize: "cover",
-                  }}
-                ></div>
-              )}
-              <div
-                className={`max-w-[70%] rounded-lg p-3 ${
-                  isUser ? "bg-blue-500 text-white" : "bg-white shadow"
-                }`}
+            return (
+              <ChatMessage
+                key={index}
+                isUser={isUser}
+                name={name}
+                text={text}
+                img={img}
+                timestamp={formatDate(new Date())}
+                isLoading={isLoading}
+                isLastMessage={index === chat.length - 1}
               >
-                <div>
-                  <div
-                    className={`mb-1 flex items-center justify-between text-sm ${
-                      isUser ? "text-white" : "text-gray-500"
-                    }`}
-                  >
-                    <div>{name}</div>
-                    <div className="mx-2">{formatDate(new Date())}</div>
-                  </div>
-                  <div>{text}</div>
-                </div>
                 {!isUser && message.clothing_ids && (
-                  <div className="grid grid-cols-2 gap-4 w-full mt-4">
-                    {message.clothing_ids.map((id) => {
-                      const clothing = CLOTHING_DATA.find(
-                        (item) => item.id === id
-                      );
-                      return (
-                        <ImageCard
-                          key={clothing.id}
-                          imageUrl={clothing.image_url}
-                          className="aspect-square"
-                        />
-                      );
-                    })}
-                  </div>
+                  <ClothingGrid
+                    clothingIds={message.clothing_ids}
+                    clothings={clothings}
+                  />
                 )}
-              </div>
-              {isUser && (
-                <div
-                  className="ml-2 h-10 w-10 rounded-full"
-                  style={{
-                    backgroundImage: `url(${img})`,
-                    backgroundSize: "cover",
-                  }}
-                ></div>
-              )}
-            </div>
-          );
-        })}
-
-        <form
-          className="flex absolute right-0 left-0 px-8 py-4 md:px-16 bottom-0 rounded-b-lg border-t bg-white md:py-8"
+              </ChatMessage>
+            );
+          })}
+        </div>
+        <div className="absolute left-0 right-0 bottom-0 top-[calc(100%-12rem)] bg-white" />
+        <ChatInput
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          isLoading={isLoading}
           onSubmit={handleSubmit}
-        >
-          <input
-            type="text"
-            className="flex-1 rounded-l border p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Create Your Own Favorite Outfit!"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            disabled={isLoading}
-          />
-          <Button type="submit" disabled={isLoading}>
-            <span>Generate</span>
-            <div
-              className="h-5 w-5"
-              style={{
-                backgroundImage: `url(${sparklingIcon})`,
-                backgroundSize: "cover",
-              }}
-            ></div>
-          </Button>
-        </form>
+        />
       </div>
     </div>
   );
