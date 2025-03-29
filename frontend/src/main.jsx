@@ -2,8 +2,77 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { backend } from 'declarations/backend';
 import botImg from '/bot.svg';
+import aiStyloImg from '/ai-stylo.png';
 import userImg from '/user.svg';
 import '/index.css';
+
+const CLOTHING_DATA = [
+  {
+    "id": 1,
+    "clothing_type": "T-Shirt",
+    "color": "Navy Blue",
+    "brand": "Nike",
+    "image_url": "https://example.com/images/nike_navy_tshirt.jpg",
+    "category": "upper"
+  },
+  {
+    "id": 2,
+    "clothing_type": "Jeans",
+    "color": "Dark Wash",
+    "brand": "Levi's",
+    "image_url": "https://example.com/images/levis_darkwash_jeans.jpg",
+    "category": "lower"
+  },
+  {
+    "id": 3,
+    "clothing_type": "Sneakers",
+    "color": "White",
+    "brand": "Adidas",
+    "image_url": "https://example.com/images/adidas_white_sneakers.jpg",
+    "category": "footwear"
+  },
+  {
+    "id": 4,
+    "clothing_type": "Blazer",
+    "color": "Black",
+    "brand": "Zara",
+    "image_url": "https://example.com/images/zara_black_blazer.jpg",
+    "category": "outerwear"
+  },
+  {
+    "id": 5,
+    "clothing_type": "Scarf",
+    "color": "Multicolor",
+    "brand": "Gucci",
+    "image_url": "https://example.com/images/gucci_multicolor_scarf.jpg",
+    "category": "accessories"
+  }
+]
+
+const PROMPT_TEMPLATE = `You are a helpful and creative fashion advisor. Your goal is to recommend the best outfit from a given list of clothing items based on the user's stated situation or desired look.
+
+Here is the list of clothing items available:
+\`\`\`json
+${JSON.stringify(CLOTHING_DATA)}
+\`\`\`
+
+The user's request is about:
+\`\`\`
+{{user_request}}
+\`\`\`
+
+Based on the user's request and the available clothing, recommend an outfit. Consider the occasion and suggest a cohesive look. Briefly explain your reasoning for the outfit choices.
+
+Your output should be in JSON format like this:
+
+\`\`\`json
+{
+  "content": "For a party, I recommend pairing the Black Blazer with the Dark Wash Jeans for a stylish yet comfortable look. You can layer the Navy Blue T-Shirt underneath for a touch of casualness. Complete the outfit with the White Sneakers for a modern and fun vibe.",
+  "clothing_ids": [4, 2, 1, 3]
+}
+\`\`\`
+`
+
 
 const App = () => {
   const [chat, setChat] = useState([
