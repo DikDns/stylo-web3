@@ -1,5 +1,7 @@
 # Stylo AI Web App
 
+![Stylo AI Preview Image](https://cdn.jsdelivr.net/gh/DikDns/stylo-assets@main/stylo-preview.jpg)
+
 Stylo AI is a fashion choice assistant that helps you find the perfect outfit for any occasion. It uses the power of AI to suggest outfits based on your preferences and style.
 
 ## How Does It Work?
