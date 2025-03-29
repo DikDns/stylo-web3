@@ -1,21 +1,27 @@
-# LLM Chatbot
+# Stylo AI Web App
 
-![LLM Chatbot](https://icp.ninja/examples/_attachments/llm_chatbot.png)
+Stylo AI is a fashion choice assistant that helps you find the perfect outfit for any occasion. It uses the power of AI to suggest outfits based on your preferences and style.
 
-The LLM Chatbot example demonstrates how an ICP smart contract can be used to interact with a large language model (LLM) to generate text. The user can input a prompt, and the smart contract will use the LLM to generate a response.
-The response is then returned to the user, and the user can submit some follow-up prompts to continue the conversation.
+## How Does It Work?
 
-This application's logic is written in [Rust](https://internetcomputer.org/docs/building-apps/developer-tools/cdks/rust/intro-to-rust).
+Stylo AI uses the power of AI to suggest outfits based on your preferences and style input. It analyzes our selected wardrobe, listed [here](https://github.com/DikDns/stylo-assets/tree/main) and suggests outfits that match your style and preferences input. Stylo AI levarages the power of AI on Chain (Model Llama 3.1 8B) to generate the outfit suggestions.
 
-## What is ICP Ninja?
+## How to Use
 
-ICP Ninja is a web-based integrated development environment (IDE) for the Internet Computer. It allows you to write code and deploy applications directly from your web browser in a temporary, sandbox-like environment.
+1. Visit the [ICP Ninja Shareable Links](https://icp.ninja/s/Gn1rw).
+2. Enter your style and preferences in the input fields.
+3. Click the "Generate" button.
+4. Stylo AI will suggest outfits that match your style and preferences with the preview images.
 
-For users who may already be familiar with the Internet Computer or who would rather use more **advanced tooling** such as command-line development tools, please refer to the [ICP developer documentation](https://internetcomputer.org/docs/building-apps/getting-started/install) to learn more.
+## Further Development Goals
 
-Projects deployed to ICP from ICP Ninja are available on the mainnet for 20 minutes at a time. After 20 minutes, the project must be redeployed.
-
-To deploy your project for long-term, production use such that it persists longer than 20 minutes without needing to be redeployed, you must migrate the files off of ICP Ninja and deploy them to the mainnet via `dfx` in a command-line environment.
+- [x] Generate outfits based on user preferences and wardrobe.
+- [x] Display outfits to users.
+- [ ] Authenticatation system with internet identity.
+- [ ] Upload custom user wardrobes.
+- [ ] Share outfits with others.
+- [ ] Rate outfits to DAO
+- [ ] Chat history.
 
 ## Project structure
 
@@ -28,9 +34,15 @@ The `/frontend` folder contains web assets for the application's user interface.
 
 ## Continue building locally
 
-To migrate your ICP Ninja project off of the web browser and develop it locally, follow these steps.
+To continue building the project locally, you'll need to:
 
-### 1. Download your project from ICP Ninja using the 'Download files' button on the upper left corner under the pink ninja star icon.
+### 1. Clone the repository
+
+```
+  git clone https://github.com/dikdns/stylo-web3 # HTTPS
+  git clone git@github.com:DikDns/stylo-web3.git # SSH
+  gh repo clone DikDns/stylo-web3 # GitHub CLI
+```
 
 ### 2. Setting up Ollama
 
