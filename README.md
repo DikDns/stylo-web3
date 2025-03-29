@@ -11,9 +11,10 @@ Stylo AI uses the power of AI to suggest outfits based on your preferences and s
 ## How to Use
 
 1. Visit the [ICP Ninja Shareable Links](https://icp.ninja/s/Gn1rw).
-2. Enter your style and preferences in the input fields.
-3. Click the "Generate" button.
-4. Stylo AI will suggest outfits that match your style and preferences with the preview images.
+2. Deploy the smart contract to the ICP network.
+3. Enter your style and preferences in the input fields.
+4. Click the "Generate" button.
+5. Stylo AI will suggest outfits that match your style and preferences with the preview images.
 
 ## Further Development Goals
 
