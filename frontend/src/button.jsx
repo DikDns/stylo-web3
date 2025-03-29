@@ -1,13 +1,12 @@
 import React from "react";
-export const Button = ({ children, icon, onClick, ...props }) => {
+export const Button = ({ children, onClick, ...props }) => {
   return (
     <button
       onClick={onClick}
-      className="w-full h-full bg-[#634AFF] rounded-2xl flex justify-center items-center"
+      className="w-full max-w-64 h-full bg-[#634AFF] gap-x-2 px-4 py-2 text-white rounded-2xl flex justify-center items-center"
       {...props}
     >
-      <span className="text-white">{children}</span>
-      {icon && <span className="ml-2">{icon}</span>}
+      {children}
     </button>
   );
 };

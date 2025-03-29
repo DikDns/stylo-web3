@@ -6,6 +6,7 @@ import aiStyloImg from "/ai-stylo.png";
 import userImg from "/user.svg";
 import sparklingIcon from "/sparkling-icon.svg";
 import "/index.css";
+import { ImageCard } from "./image-card.jsx";
 
 const CLOTHING_DATA = [
   {
@@ -108,13 +109,14 @@ const App = () => {
         newChat.push({
           role: { system: null },
           content: parsedResponse.content,
+          clothing_ids: parsedResponse.clothing_ids,
         });
         return newChat;
       });
     } catch (e) {
       console.log(e);
       const eStr = String(e);
-      const match = eStr.match(/(SysTransient|CanisterReject), \+"([^\"]+)/);
+      const match = eStr.match(/(SysTransient|CanisterReject), +"([^"]+)/);
       if (match) {
         alert(match[2]);
       }
@@ -159,39 +161,36 @@ const App = () => {
   }, [chat]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <div className="flex h-[80vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-lg">
-        <div
-          className="flex-1 overflow-y-auto rounded-t-lg bg-gray-100 p-4"
-          ref={chatBoxRef}
-        >
-          {chat.map((message, index) => {
-            const isUser = "user" in message.role;
-            const img = isUser ? userImg : aiStyloImg;
-            const name = isUser ? "User" : "Stylo AI";
-            const text = message.content;
+    <div className="p-8 md:p-16 overflow-y-auto h-screen" ref={chatBoxRef}>
+      <div className="flex-1 rounded-t-lg p-4 pb-6 md:pb-12">
+        {chat.map((message, index) => {
+          const isUser = "user" in message.role;
+          const img = isUser ? userImg : aiStyloImg;
+          const name = isUser ? "User" : "Stylo AI";
+          const text = message.content;
 
-            return (
-              <div
-                key={index}
-                className={`flex ${
-                  isUser ? "justify-end" : "justify-start"
-                } mb-4`}
-              >
-                {!isUser && (
-                  <div
-                    className="mr-2 h-10 w-10 rounded-full"
-                    style={{
-                      backgroundImage: `url(${img})`,
-                      backgroundSize: "cover",
-                    }}
-                  ></div>
-                )}
+          return (
+            <div
+              key={index}
+              className={`flex ${
+                isUser ? "justify-end" : "justify-start"
+              } w-full mb-2`}
+            >
+              {!isUser && (
                 <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    isUser ? "bg-blue-500 text-white" : "bg-white shadow"
-                  }`}
-                >
+                  className="mr-2 h-10 w-10 rounded-full"
+                  style={{
+                    backgroundImage: `url(${img})`,
+                    backgroundSize: "cover",
+                  }}
+                ></div>
+              )}
+              <div
+                className={`max-w-[70%] rounded-lg p-3 ${
+                  isUser ? "bg-blue-500 text-white" : "bg-white shadow"
+                }`}
+              >
+                <div>
                   <div
                     className={`mb-1 flex items-center justify-between text-sm ${
                       isUser ? "text-white" : "text-gray-500"
@@ -202,21 +201,38 @@ const App = () => {
                   </div>
                   <div>{text}</div>
                 </div>
-                {isUser && (
-                  <div
-                    className="ml-2 h-10 w-10 rounded-full"
-                    style={{
-                      backgroundImage: `url(${img})`,
-                      backgroundSize: "cover",
-                    }}
-                  ></div>
+                {!isUser && message.clothing_ids && (
+                  <div className="grid grid-cols-2 gap-4 w-full mt-4">
+                    {message.clothing_ids.map((id) => {
+                      const clothing = CLOTHING_DATA.find(
+                        (item) => item.id === id
+                      );
+                      return (
+                        <ImageCard
+                          key={clothing.id}
+                          imageUrl={clothing.image_url}
+                          className="aspect-square"
+                        />
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-            );
-          })}
-        </div>
+              {isUser && (
+                <div
+                  className="ml-2 h-10 w-10 rounded-full"
+                  style={{
+                    backgroundImage: `url(${img})`,
+                    backgroundSize: "cover",
+                  }}
+                ></div>
+              )}
+            </div>
+          );
+        })}
+
         <form
-          className="flex rounded-b-lg border-t bg-white p-4"
+          className="flex absolute right-0 left-0 px-8 py-4 md:px-16 bottom-0 rounded-b-lg border-t bg-white md:py-8"
           onSubmit={handleSubmit}
         >
           <input
@@ -228,7 +244,7 @@ const App = () => {
             disabled={isLoading}
           />
           <Button type="submit" disabled={isLoading}>
-            <span>Send</span>
+            <span>Generate</span>
             <div
               className="h-5 w-5"
               style={{
